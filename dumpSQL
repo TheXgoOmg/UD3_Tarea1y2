@@ -1,0 +1,158 @@
+-- MySQL dump 10.13  Distrib 9.5.0, for Linux (x86_64)
+--
+-- Host: localhost    Database: BMW_Clasicos
+-- ------------------------------------------------------
+-- Server version	9.5.0
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+Warning: A partial dump from a server that has GTIDs will by default include the GTIDs of all transactions, even those that changed suppressed parts of the database. If you don't want to restore GTIDs, pass --set-gtid-purged=OFF. To make a complete dump, pass --all-databases --triggers --routines --events. 
+Warning: A dump from a server that has GTIDs enabled will by default include the GTIDs of all transactions, even those that were executed during its extraction and might not be represented in the dumped data. This might result in an inconsistent data dump. 
+In order to ensure a consistent backup of the database, pass --single-transaction or --lock-all-tables or --source-data. 
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '843fb704-af33-11f0-91c3-9641c6aa1bfb:1-89';
+
+--
+-- Table structure for table `Chasis`
+--
+
+DROP TABLE IF EXISTS `Chasis`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Chasis` (
+  `id_chasis` bigint NOT NULL AUTO_INCREMENT,
+  `numero_chasis` varchar(255) NOT NULL,
+  `modelo` varchar(255) NOT NULL,
+  `serie` varchar(255) DEFAULT NULL,
+  `anio` int NOT NULL,
+  `color_original` varchar(255) DEFAULT NULL,
+  `id_motor` int DEFAULT NULL,
+  PRIMARY KEY (`id_chasis`),
+  UNIQUE KEY `numero_chasis` (`numero_chasis`),
+  UNIQUE KEY `id_motor` (`id_motor`),
+  CONSTRAINT `Chasis_ibfk_1` FOREIGN KEY (`id_motor`) REFERENCES `Motor` (`id_motor`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Chasis`
+--
+
+LOCK TABLES `Chasis` WRITE;
+/*!40000 ALTER TABLE `Chasis` DISABLE KEYS */;
+INSERT INTO `Chasis` VALUES (1,'E9CSL-001','BMW 3.0 CSL','E9',1973,'Golf Yellow',1),(2,'E24M6-002','BMW M635CSi','E24',1984,'Diamond Black',2),(3,'E30M3-003','BMW M3','E30',1988,'Alpine White',3),(4,'E31-850i-004','BMW 850i','E31',1990,'Calypso Red',4),(5,'E31-850CSi-005','BMW 850CSi','E31',1994,'Daytona Violet',5),(6,'E21-320i-006','BMW 320i','E21',1978,'Sahara Beige',6),(7,'E23-745i-007','BMW 745i','E23',1984,'Bronzit Beige',7),(8,'E34M5-008','BMW M5','E34',1990,'Avus Blue',8);
+/*!40000 ALTER TABLE `Chasis` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Mecanico`
+--
+
+DROP TABLE IF EXISTS `Mecanico`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Mecanico` (
+  `id_mecanico` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) DEFAULT NULL,
+  `experiencia_anios` int DEFAULT NULL,
+  `taller` varchar(255) DEFAULT NULL,
+  `id_chasis` bigint DEFAULT NULL,
+  PRIMARY KEY (`id_mecanico`),
+  KEY `FK_MEC_CHA` (`id_chasis`),
+  CONSTRAINT `FK_MEC_CHA` FOREIGN KEY (`id_chasis`) REFERENCES `Chasis` (`id_chasis`),
+  CONSTRAINT `Mecanico_chk_1` CHECK ((`experiencia_anios` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Mecanico`
+--
+
+LOCK TABLES `Mecanico` WRITE;
+/*!40000 ALTER TABLE `Mecanico` DISABLE KEYS */;
+INSERT INTO `Mecanico` VALUES (1,'Hans Müller',25,'Classic Bavarian Garage',1),(2,'Karl Schmidt',18,'Munich Motor Heritage',2),(3,'Erik Weber',30,'Oldtimer Technik',3),(4,'Lukas Braun',12,'Bavaria Performance',2),(5,'Stefan Krüger',22,'BMW Legends Restorations',3);
+/*!40000 ALTER TABLE `Mecanico` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Mecanico_Motor`
+--
+
+DROP TABLE IF EXISTS `Mecanico_Motor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Mecanico_Motor` (
+  `id_mecanico` int NOT NULL,
+  `id_motor` int NOT NULL,
+  `fecha_certificacion` date DEFAULT NULL,
+  PRIMARY KEY (`id_mecanico`,`id_motor`),
+  KEY `id_motor` (`id_motor`),
+  CONSTRAINT `Mecanico_Motor_ibfk_1` FOREIGN KEY (`id_mecanico`) REFERENCES `Mecanico` (`id_mecanico`),
+  CONSTRAINT `Mecanico_Motor_ibfk_2` FOREIGN KEY (`id_motor`) REFERENCES `Motor` (`id_motor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Mecanico_Motor`
+--
+
+LOCK TABLES `Mecanico_Motor` WRITE;
+/*!40000 ALTER TABLE `Mecanico_Motor` DISABLE KEYS */;
+INSERT INTO `Mecanico_Motor` VALUES (1,1,'2005-03-14'),(1,7,'2003-02-10'),(2,2,'2010-06-22'),(2,5,'2018-07-09'),(3,3,'2008-09-17'),(3,8,'2012-12-01'),(4,4,'2015-11-05'),(5,6,'2001-04-28');
+/*!40000 ALTER TABLE `Mecanico_Motor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Motor`
+--
+
+DROP TABLE IF EXISTS `Motor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Motor` (
+  `id_motor` int NOT NULL AUTO_INCREMENT,
+  `codigo_motor` varchar(20) NOT NULL,
+  `tipo` varchar(50) NOT NULL,
+  `cilindrada` double NOT NULL,
+  `anio_fabricacion` int DEFAULT NULL,
+  `potencia_hp` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_motor`),
+  UNIQUE KEY `codigo_motor` (`codigo_motor`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Motor`
+--
+
+LOCK TABLES `Motor` WRITE;
+/*!40000 ALTER TABLE `Motor` DISABLE KEYS */;
+INSERT INTO `Motor` VALUES (1,'M30B30','Gasolina',3,1971,'200'),(2,'M88/3','Gasolina',3.5,1984,'286'),(3,'S14B23','Gasolina',2.3,1986,'200'),(4,'M70B50','Gasolina',5,1987,'300'),(5,'S70B56','Gasolina',5.6,1991,'618'),(6,'M10B18','Gasolina',1.8,1975,'105'),(7,'M30B35','Gasolina',3.5,1982,'218'),(8,'S38B36','Gasolina',3.6,1988,'315');
+/*!40000 ALTER TABLE `Motor` ENABLE KEYS */;
+UNLOCK TABLES;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-11-12 12:06:36
